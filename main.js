@@ -35,5 +35,6 @@ app.on('window-all-closed', () => {
 
 function getArticleSearch(event) {
   event.preventDefault()
-  document.getElementById("demo").innerHTML = document.getElementById("searchBar").value
+  keyword = document.getElementById("searchBar").value
+  //document.getElementById("demo").innerHTML = keyword
 }

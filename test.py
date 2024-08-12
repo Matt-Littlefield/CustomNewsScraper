@@ -1,11 +1,13 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 import requests
+from concurrent.futures import ThreadPoolExecutor
 
-#driver = webdriver.Chrome()
+def parseHeadline(headline):
+    nextPage = requests.get(headline).text
+    nextSoup = BeautifulSoup(nextPage,"html.parser")
+    text = nextSoup.find_all("p")
+    return text
 
-#driver.quit()
 
 request = requests.get("https://www.cnn.com/").text
 markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
@@ -13,14 +15,24 @@ markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
 
 soup = BeautifulSoup(request, features="html.parser")
 
-headlines = soup.find_all('a',href=True)
-
+headlines = ["https://www.cnn.com" + a['href'] for a in soup.find_all('a', href=True) if a['href'].startswith("/2024")]
+"""
 for headline in headlines:
-    if headline['href'] and headline['href'][0:5] == '/2024':
-        page = "https://www.cnn.com" + headline['href']
-        nextpage = requests.get(page).text
-        next = BeautifulSoup(nextpage,"html.parser")
-        text = next.find_all("p")
-        for p in text:
-            print(p.text)
+    nextPage = requests.get(headline).text
+    nextSoup = BeautifulSoup(nextPage,"html.parser")
+    text = nextSoup.find_all("p")
+    for p in text:
+        print(p.text)
+"""
+with ThreadPoolExecutor() as exe:
+    results = exe.map(parseHeadline,headlines)
 
+for i in range(len(tuple(results))):
+    print(results)
+
+"""
+for r in results:
+    for p in r:
+        print(p.text)
+    break
+"""
