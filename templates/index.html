@@ -4,13 +4,23 @@
     <meta charset="UTF-8">
     <title>News Scraper</title>
 </head>
-    <ul>
-        {% for link in links %}
-            <li>
-                <a href = "{{ link }}">{{ link }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-<body>
-</body>
+    <body>
+        <div>
+            <form method = "POST" action = "/search">
+                <p><input type = "text" name = "search"/></p>
+                <button type = "submit" value = "submit">Search</button>
+            </form>
+        </div>
+        <div>
+            <form>
+                <ul>
+                    {% for link in links %}
+                        <li>
+                            <a href = "{{ link }}">{{ link }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </form>
+        </div>
+    </body>
 </html>

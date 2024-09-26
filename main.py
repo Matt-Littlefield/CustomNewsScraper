@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import requests
 from concurrent.futures import ThreadPoolExecutor
 import re
-import json
 from flask import request
 from flask import Flask, render_template
 
@@ -29,33 +28,34 @@ def parseHeadline(headline):
         returnList.append(tempList)
     return returnList
 
+@app.route('/')
 def index():
     return render_template("index.html")
 
-@app.route('/')
+@app.route('/search',methods=["POST","GET"])
 def main():
-    request = requests.get("https://www.cnn.com/").text
-    markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
+    if request.method == "POST":
+        articles = requests.get("https://www.cnn.com/").text
+        markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
 
 
-    soup = BeautifulSoup(request, features="html.parser")
+        soup = BeautifulSoup(articles, features="html.parser")
 
-    headlines = ["https://www.cnn.com" + a['href'] for a in soup.find_all('a', href=True) if a['href'].startswith("/2024")]
+        headlines = ["https://www.cnn.com" + a['href'] for a in soup.find_all('a', href=True) if a['href'].startswith("/2024")]
 
-    headlines = list(set(headlines))
+        headlines = list(set(headlines))
 
-    with ThreadPoolExecutor() as exe:
-        results = exe.map(parseHeadline,headlines)
+        with ThreadPoolExecutor() as exe:
+            results = exe.map(parseHeadline,headlines)
 
-    links = []
-    searchTerm = "trump"
-    for result in results:
-        for i in range(1,len(result)):
-            if searchTerm in result[i]:
-                links.append(result[0])
-                break
-
-    return render_template("index.html",links = links)
+        links = []
+        searchTerm = request.form["search"]
+        for result in results:
+            for i in range(1,len(result)):
+                if searchTerm in result[i]:
+                    links.append(result[0])
+                    break
+        return render_template("index.html",links = links)
 
 if __name__ == "__main__":
     app.run(debug=True)
