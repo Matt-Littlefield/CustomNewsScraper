@@ -1,6 +1,12 @@
 const { app, BrowserWindow } = require('electron')
 const path = require('node:path')
 
+let links = "{{links}}";
+    console.log(links);
+    for (let i = 0; i < links.length; i++ ){
+        console.log(links[i]);
+    }
+
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -34,13 +40,6 @@ app.on('window-all-closed', () => {
 })
 
 function getArticleSearch(event) {
-  $.ajax({
-    type: "POST",
-    url: "~/test.py",
-    data: { param: text}
-  }).done(function( o ) {
-     main()
-  });
   event.preventDefault();
   keyword = document.getElementById("searchBar").value;
   document.getElementById("demo").innerHTML = keyword;
